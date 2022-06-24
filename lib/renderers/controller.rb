@@ -5,7 +5,7 @@ require_relative '../response'
 def controlled_execution(file, request)
     x = binding
     x.eval file
-    return x.method(request.method.downcase).call(request)
+    return x.method(request.req_method.downcase).call(request)
 end
 
 class ControllerRenderer < RawRenderer

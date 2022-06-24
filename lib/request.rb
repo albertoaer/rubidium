@@ -1,10 +1,10 @@
 class Request
-    attr_reader :lines, :method, :version, :attributes, :route, :query, :ext, :path, :params, :resolved
+    attr_reader :lines, :req_method, :version, :attributes, :route, :query, :ext, :path, :params, :resolved
 
     def initialize(input, &block)
         @raw = input
         @lines = input.split("\r\n")
-        @method, route, @version = @lines[0].split(' ')
+        @req_method, route, @version = @lines[0].split(' ')
         @route, query = route.split('?')
         @query = query&.split(/[\;,&]/)&.map { |v| get_query_pair(v) }&.to_h
         @attributes = @lines[1..-1].map { |field| field.split(': ') if field.length > 0 }
