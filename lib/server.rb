@@ -2,6 +2,7 @@ require 'socket'
 require_relative 'service'
 require_relative 'request'
 require_relative 'httperror'
+require_relative './middleware/middleware'
 
 class Server < Service
     policy :restart
@@ -13,7 +14,20 @@ class Server < Service
         @config = config
         @config[:ip] = @config[:ip] || Socket.ip_address_list.find_all { |a| a.ipv4? && !a.ipv4_loopback? }[-1].ip_address
         @config[:port] = @config[:port] || 80
+        @middleware_before = []
+        @middleware_after = []
     end
+
+    def use(middleware, mode=:both)
+        raise "Wrong mode: #{mode}" unless [:before, :after, :both].include? mode
+        raise "Expecting a middleware object" unless middleware.class.include? Middleware
+        @middleware_before.append middleware.method(:before) if mode != :after
+        @middleware_after.unshift middleware.method(:after) if mode != :before
+    end
+
+    def before(&block) @middleware_before.append block end
+    
+    def after(&block) @middleware_after.unshift block end
 
     def call
         @server.close unless @server.nil?
@@ -23,7 +37,8 @@ class Server < Service
         while client = @server.accept
             petition = Proc.new do
                 request_input = client.readpartial 2048
-                response = get_response request_input
+                request = Request.new request_input, &@services
+                response = get_response request
                 response.write 'HTTP/1.1', &client.method(:print)
                 client.close
             end
@@ -33,12 +48,25 @@ class Server < Service
 
     private
 
-    def get_response(request_input)
+    def render(request)
         begin
-            request = Request.new(request_input, &@services)
             @services.call :render, request
         rescue HTTPError => e
             e.as_response
         end
+    end
+
+    def get_response(request)
+        @middleware_before.each do |func|
+            ans = func.call request
+            request = ans if ans.class == Request
+            return ans if ans.class == Response
+        end
+        response = render request
+        @middleware_after.each do |func|
+            ans = func.call request, response
+            return ans if ans.class == Response
+        end
+        response
     end
 end

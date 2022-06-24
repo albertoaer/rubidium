@@ -9,6 +9,7 @@ require_relative 'lib/renderers/controller'
 require_relative 'lib/renderers/erb_template'
 require_relative 'lib/renderers/sql'
 require_relative 'lib/vault'
+require_relative 'lib/middleware/error_redirect'
 
 app = App.new
 
@@ -34,6 +35,9 @@ app.provide SharedPrefs.new, pref: :get_pref
 
 Server.new do
     setup **Vault.from('server', 'server.local') #Load config from server and local server
+    before { |req| puts "#{req} came" }
+    after { |req, res| puts "#{res} went" }
+    use ErrorRedirect.new('/todo.md', 404), :after
     app.serve self
 end
 
