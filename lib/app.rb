@@ -5,6 +5,7 @@ class App
         @services = Array.new
         @primitives = Hash.new
         @primitives[:launch] = method(:launch)
+        @primitives[:spawn] = -> (&block) { launch(block) }
     end
 
     def include(service, **primitives)
@@ -25,9 +26,10 @@ class App
             @pool.post do
                 finnished = false
                 begin
-                    runnable.call { |name, *args| @primitives[name].(*args) }
+                    runnable.call { |name, *args, **kwargs, &block| @primitives[name].(*args, **kwargs, &block) }
                 rescue StandardError => e
                     puts "Rescued[#{runnable.class.name}]: #{e.inspect}"
+                    e.backtrace.each { |x| puts "\t#{x}" }
                 else
                     finnished = true
                 end while runnable.respond_to?(:restart?) && runnable.restart?
