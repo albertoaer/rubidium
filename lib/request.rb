@@ -6,7 +6,7 @@ class Request
         @lines = input.split("\r\n")
         @method, route, @version = @lines[0].split(' ')
         @route, query = route.split('?')
-        @query = query&.split(/[\;,&]/)&.map { |v| v.split('=') }&.to_h
+        @query = query&.split(/[\;,&]/)&.map { |v| get_query_pair(v) }&.to_h
         @attributes = @lines[1..-1].map { |field| field.split(': ') if field.length > 0 }
         @services = block
         @resolved = false
@@ -30,5 +30,13 @@ class Request
 
     def get_binding
         binding
+    end
+
+    private
+    
+    def get_query_pair(query_val)
+        i = query_val.index('=')
+        return [query_val, ''] if i.nil?
+        [query_val[0..i-1], query_val[i+1..-1]]
     end
 end
