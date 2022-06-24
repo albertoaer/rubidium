@@ -26,7 +26,7 @@ Renderer.new do
     use RawRenderer.new, :css, :js, :txt
     use ERBRenderer.new, :erb
     use ControllerRenderer.new, :rb
-    use SqlRenderer.new(**Vault.from('db', 'db.local')), :sql
+    use SqlRenderer.new(**Vault.select('db', 'db.local')), :sql
     app.provide self, render: :render
 end
 
