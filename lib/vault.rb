@@ -32,24 +32,40 @@ module Vault
     
     @@data = {}
 
+    ##
+    # Include a dataset for first time into the vault
     def self.load(name, data)
         raise "Already loaded into the Vault: #{name}" if @@data.key? name
         @@data[name] = data
     end
 
+    ##
+    # Update the content of a dataset already included into the vault
     def self.update(name, data)
         raise "Not loaded into the Vault: #{name}" unless @@data.key? name
         @@data[name] = data
     end
 
-    ## The from methods allow merging multiple sources in order to mix or replace multiple configurations
-    # The first elements are least priority and will be overwritten by the last ones in case of same key
+    ##
+    # Merges all the datasets and in case of conflict those on the left have preference
     def self.from(*names)
         res = {}
         names.map { |name| @@data[name] }.each { |v| res.merge! v unless v.nil? }
         res
     end
 
+    ##
+    # Selects an available dataset having preference those on the left
+    def self.select(*names)
+        names.reverse_each do |k|
+            if @@data.key? k
+                return @@data[k]
+            end
+        end
+    end
+    
+    ##
+    # Iterates the datasets
     def self.each(&block)
         @@data.each &block
     end
