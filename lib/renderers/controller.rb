@@ -9,7 +9,8 @@ end
 
 class ControllerRenderer < RawRenderer
     def solve_response(response)
-        ["Content-Type: #{content_type response[0]}", response[1]]
+        return response if response.first == :redirect
+        ["Content-Type: #{content_type response.first}", response.last]
     end
 
     def render(request)
