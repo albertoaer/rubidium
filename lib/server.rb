@@ -22,10 +22,9 @@ class Server < Service
 
         while client = @server.accept
             petition = Proc.new do
-                request_input = client.readpartial(2048)
-                response = get_response(request_input)
-                write_response(response, &client.method(:print))
-
+                request_input = client.readpartial 2048
+                response = get_response request_input
+                response.write 'HTTP/1.1', &client.method(:print)
                 client.close
             end
             @services.call :launch, petition
@@ -37,26 +36,9 @@ class Server < Service
     def get_response(request_input)
         begin
             request = Request.new(request_input, &@services)
-            res = @services.call :render, request
-            if res.first == :redirect
-                ["HTTP/1.1 302 Redirect", "Location: #{res.last}", ""]
-            else
-                res.unshift 'HTTP/1.1 200 OK'
-            end
+            @services.call :render, request
         rescue HTTPError => e
-            ["HTTP/1.1 #{e.code} #{e.concept}", ""]
-        end
-    end
-
-    def write_response(response)
-        response.each_with_index do |v, i|
-            if i == response.length - 1
-                yield "\r\n"
-                yield v    
-            else
-                yield v
-                yield "\r\n"
-            end
+            e.as_response
         end
     end
 end

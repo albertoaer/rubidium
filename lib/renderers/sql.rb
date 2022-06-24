@@ -1,6 +1,7 @@
 require 'pg'
 require 'json'
 require_relative 'raw'
+require_relative '../response'
 
 class SqlRenderer < RawRenderer
     def initialize(**config)
@@ -11,7 +12,7 @@ class SqlRenderer < RawRenderer
         src = yield :file, request.path
         result = @conn.exec_params(src, request.params)
         json = get_json(result)
-        ["Content-Type: application/json", json]
+        Response.ok json, 'Content-Type' => 'application/json'
     end
 
     private

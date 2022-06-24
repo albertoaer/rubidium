@@ -1,5 +1,6 @@
 require_relative 'raw'
 require_relative '../HTTPError'
+require_relative '../response'
 
 def controlled_execution(file, request)
     x = binding
@@ -8,9 +9,10 @@ def controlled_execution(file, request)
 end
 
 class ControllerRenderer < RawRenderer
-    def solve_response(response)
-        return response if response.first == :redirect
-        ["Content-Type: #{content_type response.first}", response.last]
+    def solve_response(res)
+        return res if res.class == Response
+        return Response.to res.last if res.first == :redirect
+        Response.ok res.last, 'Content-Type' => content_type(res.first)
     end
 
     def render(request)

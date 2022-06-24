@@ -1,6 +1,8 @@
+require_relative '../response'
+
 class RawRenderer
-    def render(request)     
-        ["Content-Type: #{content_type request.ext}", yield(:file, request.path)]
+    def render(request)
+        Response.new 200, 'Ok', yield(:file, request.path), 'Content-Type' => (content_type request.ext)
     end
 
     def content_type(ext)

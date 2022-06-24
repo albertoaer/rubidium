@@ -1,3 +1,5 @@
+require_relative 'response'
+
 ##
 # It can be raised at any step in the rendering process avoiding the service to crash
 # A middleware can use it to render a response, by default it will create an error http response
@@ -10,5 +12,9 @@ class HTTPError < StandardError
         @message = message
         @concept = concept
         super("[Error #{code}]: #{message}")
+    end
+
+    def as_response
+        Response.new @code, @concept
     end
 end
