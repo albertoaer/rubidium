@@ -30,6 +30,8 @@ Renderer.new do
     app.provide self, render: :render
 end
 
+app.provide SharedPrefs.new, pref: :get_pref
+
 Server.new do
     setup **Vault.from('server', 'server.local') #Load config from server and local server
     app.serve self

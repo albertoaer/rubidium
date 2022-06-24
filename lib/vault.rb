@@ -54,6 +54,20 @@ module Vault
     end
 end
 
+## Vault configuration files shared accross the application
+class SharedPrefs
+    @@shared = ['sharedprefs', 'sharedprefs.local']
+
+    def self.allow(name)
+        @@shared << name
+    end
+
+    def get_pref(name)
+        s = Vault.from(*@@shared)
+        s[name] unless s.nil?
+    end
+end
+
 if File.directory? 'vault'
     Dir.foreach 'vault' do |item|
         name = File.join('vault', item)
@@ -71,6 +85,7 @@ if File.directory? 'vault'
                 raise "Unknown Vault rule: #{rule.to_s}"
             end
         end
+        SharedPrefs.allow(name) if File.extname(name) == '.shared'
         Vault.update(name, content)
     end
 end
