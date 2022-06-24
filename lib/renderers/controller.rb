@@ -8,9 +8,7 @@ end
 
 class ControllerRenderer < RawRenderer
     def solve_response(response)
-        ["Content-Type: #{content_type response[0]}\r\n",
-        "\r\n",
-        response[1]]
+        ["Content-Type: #{content_type response[0]}", response[1]]
     end
 
     def render(request)
@@ -18,7 +16,7 @@ class ControllerRenderer < RawRenderer
         when :rb
             filedata = yield :file, request.route
         when nil
-            filedata = yield :file, File.join(request.route, 'index.rb')
+            filedata = yield :file, request.route + '.rb'
         end
         solve_response controlled_execution(filedata, request)
     end

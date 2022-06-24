@@ -26,8 +26,12 @@ class Server < Service
 
                 response = yield :render, request
                 
-                client.print "HTTP/1.1 200\r\n"
-                response.each { |data| client.print data }
+                response.unshift "HTTP/1.1 200"
+                response.each_with_index do |data, idx|
+                    client.print data
+                    client.print "\r\n" if idx < response.length - 1
+                    client.print "\r\n" if idx == response.length - 2
+                end
 
                 client.close
             end
