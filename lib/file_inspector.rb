@@ -65,36 +65,41 @@ class FileInspector < Service
         while opened_dirs.size > 0
             orig = opened_dirs.pop
             Dir.entries(orig[0]).each do |f|
-                next if  f == '.' or f == '..' # Exclude ., ..
+                next if f == '.' or f == '..' # Exclude ., ..
                 rpath = File.join orig[0], f
-                if File.directory? rpath
+                vessel, name, data = if File.directory? rpath
                     childs = {}
                     opened_dirs << [rpath, childs]
-                    raise "Collision detected for directory name: #{f}" if orig[1].key? f
-                    orig[1][f] = childs
+                    [orig[1], f, childs]
                 else
                     name = v_name f
-                    if orig[1].key? name
-                        ext = v_ext f
-                        raise "Collision detected for file name: #{name} on extension: #{ext}" if orig[1][name].key? ext
-                        orig[1][name][ext] = rpath
-                    else orig[1][name] = {v_ext(f) => rpath} end
+                    ext = v_ext(f)
+                    if name.nil?
+                        [orig[1], ext, rpath]
+                    elsif orig[1].key? name
+                        [orig[1][name], ext, rpath]
+                    else
+                        [orig[1], name, {ext => rpath}]
+                    end
                 end
+                raise "Collision detected for tree name '#{name}' on: #{rpath}" if vessel.key? name
+                vessel[name] = data
             end
         end
     end
 
     def solve_route(route)
         path = route.split('/').filter { |p| p.length > 0 }
-        path << "" if path.length == 0
-        
-        name, ext = v_divide path[path.length-1]
-        path[path.length-1] = name
-        unless ext.nil?
-            unless no_route_ext.include? ext
-                raise HTTPError.new 403, "Trying to access not allowed route: #{ext}"
+
+        if path.length > 0
+            name, ext = v_divide path.pop
+            path << name unless name.nil?
+            unless ext.nil?
+                unless no_route_ext.include? ext
+                    raise HTTPError.new 403, "Trying to access not allowed route: #{ext}"
+                end
+                path << ext
             end
-            path << ext
         end
 
         current = @tree
@@ -125,7 +130,8 @@ class FileInspector < Service
 
     ## Virtual name without extension, a hidden file's name would be empty String
     def v_name(current)
-        File.basename('_' + current, '.*')[1..-1]
+        name = File.basename('_' + current, '.*')[1..-1]
+        name.length == 0 ? nil : name
     end
 
     ## Virtual extension, even hidden files are treat as extensions
