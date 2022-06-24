@@ -17,7 +17,7 @@ class App
 
     ## An utility only provides primitives to the services
     def provide(utility, **primitives)
-        utility.set_services &@fn_services if utility.method(:set_services)
+        utility.set_services &@fn_services if utility.respond_to?(:set_services)
         primitives.each { |key, val| @primitives[key] = utility.method(val) }
     end
 
