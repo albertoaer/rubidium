@@ -5,7 +5,7 @@
 
 # About
 
-Rubidium is focused on a hierarchical and intuitive resource fetching model where each file is renderer based on its kind. This model allows a maintainable server structure.
+Rubidium is an HTTP framework focused on a hierarchical and intuitive resource fetching model where each file is renderer based on its kind. This model allows a maintainable server structure and an abstracted file rendering process.
 
 An application must have at least 3 services
 - Server, that abstract the process of comunication with clients
@@ -18,11 +18,11 @@ Those processes can comunicate among them using primitives exposed to the aplica
 
 Clone the project
 ```
-git clone https://github.com/albertoaer/Rubidium.git
+git clone https://github.com/albertoaer/rubidium.git
 ```
 
-Application implementation is written at [./main.rb](./main.rb)
+Application implementation is written at [main.rb](./main.rb)
 
-Public files will be located at *./public* folder
+Public files will be located at [public](./public) folder
 
-If you want a custom renderer, add it to the *./lib/renderers* folders and `use` it at the Renderer in [./main.rb](./main.rb)
+If you want a custom renderer, add it to the [renderers](./lib/renderers) folder and `use` it at the Renderer in the [main](./main.rb) application file
