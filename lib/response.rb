@@ -8,6 +8,10 @@ class Response
         @body = body
     end
 
+    def self.default(**atributes)
+        Response.new 204, 'No Content', **atributes
+    end
+
     def self.ok(body, **attributes)
         Response.new 200, 'Ok', body, **attributes
     end
