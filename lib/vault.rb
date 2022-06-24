@@ -43,6 +43,7 @@ module Vault
     end
 
     ## The from methods allow merging multiple sources in order to mix or replace multiple configurations
+    # The first elements are least priority and will be overwritten by the last ones in case of same key
     def self.from(*names)
         res = {}
         names.map { |name| @@data[name] }.each { |v| res.merge! v unless v.nil? }
