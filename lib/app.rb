@@ -22,7 +22,6 @@ class App
     private
 
     def launch(runnable)
-        puts runnable.class.policies if runnable.class.respond_to? :policies
         if runnable.class.method_defined? :call
             @pool.post do
                 finnished = false
