@@ -1,0 +1,5 @@
+#The only public's files purpose is testing or application deploy, fulfill it as you want
+public/*
+
+#Avoid ignore welcome files ;)
+!public/welcome.*
