@@ -6,6 +6,7 @@ require_relative 'lib/renderers/html'
 require_relative 'lib/renderers/markdown'
 require_relative 'lib/renderers/raw'
 require_relative 'lib/renderers/controller'
+require_relative 'lib/renderers/erb_template'
 
 app = App.new
 
@@ -19,6 +20,7 @@ Renderer.new do
     use HTMLRenderer.new, :html
     use MarkdownRenderer.new, :md
     use RawRenderer.new, :css, :js, :txt
+    use ERBRenderer.new, :erb
     router ControllerRenderer.new, :rb
     app.include self, render: :render
 end

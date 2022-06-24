@@ -21,4 +21,8 @@ class Request
         r = Request.new("GET #{file} #{@version}\r\n\r\n", &@services)
         service :render, r
     end
+
+    def get_binding
+        binding
+    end
 end
