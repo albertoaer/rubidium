@@ -22,6 +22,7 @@ class App
     private
 
     def launch(runnable)
+        puts runnable.class.policies if runnable.class.respond_to? :policies
         if runnable.class.method_defined? :call
             @pool.post do
                 finnished = false
@@ -29,10 +30,10 @@ class App
                     runnable.call { |name, *args, **kwargs, &block| @primitives[name].(*args, **kwargs, &block) }
                 rescue StandardError => e
                     puts "Rescued[#{runnable.class.name}]: #{e.inspect}"
-                    e.backtrace.each { |x| puts "\t#{x}" }
+                    e.backtrace.each { |x| puts "\t#{x}" } if Service.about runnable, :inspect
                 else
                     finnished = true
-                end while runnable.respond_to?(:restart?) && runnable.restart?
+                end while Service.about runnable, :restart
                 if not finnished
                     puts "Aborted[#{runnable.class.name}]"
                 end

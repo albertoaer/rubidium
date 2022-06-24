@@ -1,11 +1,11 @@
 require 'socket'
-require_relative 'policy'
 require_relative 'service'
 require_relative 'request'
 require_relative 'HTTPError'
 
 class Server < Service
-    include Policy::Restart
+    policy :restart
+    policy :inspect
 
     attr_reader :config
 

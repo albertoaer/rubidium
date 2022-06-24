@@ -1,4 +1,3 @@
-require_relative 'policy'
 require_relative 'service'
 require_relative 'HTTPError'
 
@@ -31,7 +30,8 @@ class FileRecord
 end
 
 class FileInspector < Service
-    include Policy::Restart
+    policy :restart
+    policy :inspect
 
     attr_reader :target, :records
 
