@@ -19,6 +19,7 @@ class Renderer < Service
     end
 
     def render(request)
+        request.resolve! unless request.resolved #Prevent resolve twice if it's already done
         renderer = get_renderer_for(request.ext)
         unless renderer.nil?
             renderer.render(request, &@services)

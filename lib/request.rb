@@ -1,5 +1,5 @@
 class Request
-    attr_reader :lines, :method, :version, :attributes, :route, :query, :ext, :path, :params
+    attr_reader :lines, :method, :version, :attributes, :route, :query, :ext, :path, :params, :resolved
 
     def initialize(input, &block)
         @raw = input
@@ -8,8 +8,15 @@ class Request
         @route, query = route.split('?')
         @query = query&.split(/[\;,&]/)&.map { |v| v.split('=') }&.to_h
         @attributes = @lines[1..-1].map { |field| field.split(': ') if field.length > 0 }
-        @path, @ext, @params = yield :solve_route, @route
         @services = block
+        @resolved = false
+    end
+    
+    ##
+    # Resolve a request is the only operation that can cause an exception, so it's handled separately
+    def resolve!
+        @path, @ext, @params = @services.call :solve_route, @route
+        @resolved = true
     end
 
     def service(*args, **kwargs, &block)
