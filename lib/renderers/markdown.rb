@@ -3,7 +3,7 @@ require_relative 'raw'
 
 class MarkdownRenderer < RawRenderer
     def initialize
-        @markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true);
+        @markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true)
     end
 
     def render(request)
