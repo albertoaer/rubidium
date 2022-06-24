@@ -2,6 +2,7 @@ require 'socket'
 require_relative 'policy'
 require_relative 'service'
 require_relative 'request'
+require_relative 'HTTPError'
 
 class Server < Service
     include Policy::Restart
@@ -24,13 +25,16 @@ class Server < Service
                 request_input = client.readpartial(2048)
                 request = Request.new(request_input, &services)
 
-                response = yield :render, request
+                response = begin
+                    yield(:render, request).unshift "HTTP/1.1 200"
+                rescue HTTPError => e
+                    ["HTTP/1.1 #{e.code} #{e.concept}"]
+                end
                 
-                response.unshift "HTTP/1.1 200"
                 response.each_with_index do |data, idx|
                     client.print data
-                    client.print "\r\n" if idx < response.length - 1
-                    client.print "\r\n" if idx == response.length - 2
+                    client.print "\r\n" if idx < response.length - 1 || response.length == 1
+                    client.print "\r\n" if idx == response.length - 2 || response.length == 1
                 end
 
                 client.close

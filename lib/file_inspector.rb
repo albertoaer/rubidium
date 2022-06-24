@@ -1,5 +1,6 @@
 require_relative 'policy'
 require_relative 'service'
+require_relative 'HTTPError'
 
 class FileRecord
     attr_reader :data
@@ -78,7 +79,7 @@ class FileInspector < Service
             record.data
         rescue Errno::ENOENT
             @records.delete(filename) unless notexists
-            '404'
+            raise HTTPError.new 404, 'File not found'
         end
     end
 

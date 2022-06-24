@@ -1,4 +1,5 @@
 require_relative 'raw'
+require_relative '../HTTPError'
 
 def controlled_execution(file, request)
     x = binding

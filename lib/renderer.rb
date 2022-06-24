@@ -1,3 +1,4 @@
+require_relative 'HTTPError'
 require_relative 'service'
 
 class Renderer < Service    
@@ -27,7 +28,7 @@ class Renderer < Service
         unless renderer.nil?
             renderer.render(request, &@services)
         else
-            puts "No render found for extension: #{request.ext}"
+            raise HTTPError.new 404, "No render found for extension: #{request.ext}"
         end
     end
 
