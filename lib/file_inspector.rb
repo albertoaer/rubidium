@@ -1,5 +1,5 @@
 require_relative 'service'
-require_relative 'HTTPError'
+require_relative 'httperror'
 
 class FileRecord
     attr_reader :data

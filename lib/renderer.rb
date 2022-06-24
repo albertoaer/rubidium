@@ -1,4 +1,4 @@
-require_relative 'HTTPError'
+require_relative 'httperror'
 require_relative 'service'
 
 class Renderer < Service    

@@ -1,7 +1,7 @@
 require 'socket'
 require_relative 'service'
 require_relative 'request'
-require_relative 'HTTPError'
+require_relative 'httperror'
 
 class Server < Service
     policy :restart
