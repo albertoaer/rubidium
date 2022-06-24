@@ -7,7 +7,7 @@ class Request
         @method, route, @version = @lines[0].split(' ')
         @route, query = route.split('?')
         @query = query&.split(/[\;,&]/)&.map { |v| v.split('=') }&.to_h
-        @attributes = @lines[1..-1].map { |field| field.split(': ') if field.length() > 0 }
+        @attributes = @lines[1..-1].map { |field| field.split(': ') if field.length > 0 }
         @ext = (File.extname @route)[1..-1]
         @ext = @ext.to_sym unless @ext.nil?
         @services = block
