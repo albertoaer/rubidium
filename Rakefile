@@ -1,5 +1,5 @@
-task default: %w[start]
+task default: %w[run]
 
-task :start do
+task :run do
     load './main.rb'
 end
