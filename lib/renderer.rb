@@ -27,8 +27,6 @@ class Renderer < Service
         end
     end
 
-    def call(&services) @services = services end
-
     private
 
     def get_renderer_for(ext)

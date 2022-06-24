@@ -5,12 +5,20 @@ class App
         @services = Array.new
         @primitives = Hash.new
         @primitives[:launch] = method(:launch)
-        @primitives[:spawn] = -> (&block) { launch(block) }
+        @primitives[:spawn] = lambda { |&block| launch(block) }
+        @fn_services = lambda { |name, *args, **kwargs, &block| @primitives[name].(*args, **kwargs, &block) }
     end
 
-    def include(service, **primitives)
+    ## The service wil be launched when the app starts
+    def serve(service, **primitives)
         @services.push(service)
-        primitives&.each { |key, val| @primitives[key] = service.method(val) }
+        provide service, **primitives
+    end
+
+    ## An utility only provides primitives to the services
+    def provide(utility, **primitives)
+        utility.set_services &@fn_services if utility.method(:set_services)
+        primitives.each { |key, val| @primitives[key] = utility.method(val) }
     end
 
     def run(threads=5)
@@ -26,7 +34,7 @@ class App
             @pool.post do
                 finnished = false
                 begin
-                    runnable.call { |name, *args, **kwargs, &block| @primitives[name].(*args, **kwargs, &block) }
+                    runnable.call
                 rescue StandardError => e
                     puts "Rescued[#{runnable.class.name}]: #{e.inspect}"
                     e.backtrace.each { |x| puts "\t#{x}" } if Service.about runnable, :inspect

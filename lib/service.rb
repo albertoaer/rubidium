@@ -9,15 +9,8 @@ class Service
         end
     end
 
-    def initialize(&block)
-        instance_exec &block if block_given?
-    end
-
     def self.policy(name, action=true)
         self.policies[name] = action
-    end
-
-    def call
     end
 
     def self.about(service, action)
@@ -26,5 +19,16 @@ class Service
         else
             @@default_policies[action]
         end
+    end
+
+    def initialize(&block)
+        instance_exec &block if block_given?
+    end
+
+    def set_services(&services)
+        @services = services
+    end
+
+    def call
     end
 end

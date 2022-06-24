@@ -15,7 +15,7 @@ class Server < Service
         @config[:port] = @config[:port] || 80
     end
 
-    def call(&services)
+    def call
         @server.close unless @server.nil?
         puts "Listenning on #{@config[:ip]}:#{@config[:port]}"
         @server = TCPServer.new @config[:ip], @config[:port]
@@ -23,21 +23,21 @@ class Server < Service
         while client = @server.accept
             petition = Proc.new do
                 request_input = client.readpartial(2048)
-                response = get_response(request_input, &services)
+                response = get_response(request_input)
                 write_response(response, &client.method(:print))
 
                 client.close
             end
-            services.call :launch, petition
+            @services.call :launch, petition
         end
     end
 
     private
 
-    def get_response(request_input, &services)
+    def get_response(request_input)
         begin
-            request = Request.new(request_input, &services)
-            res = yield :render, request
+            request = Request.new(request_input, &@services)
+            res = @services.call :render, request
             if res.first == :redirect
                 ["HTTP/1.1 302 Redirect", "Location: #{res.last}", ""]
             else

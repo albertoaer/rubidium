@@ -17,7 +17,7 @@ FileInspector.new do
     track "./public"
     @route_ext = [ :rb, :erb, :sql ]
     @no_route_ext = [ :html, :js, :css, :md ]
-    app.include self, file: :request, solve_route: :solve_route
+    app.serve self, file: :request, solve_route: :solve_route
 end
 
 Renderer.new do
@@ -27,12 +27,12 @@ Renderer.new do
     use ERBRenderer.new, :erb
     use ControllerRenderer.new, :rb
     use SqlRenderer.new(**Vault.from('db', 'db.local')), :sql
-    app.include self, render: :render
+    app.provide self, render: :render
 end
 
 Server.new do
     setup **Vault.from('server', 'server.local') #Load config from server and local server
-    app.include self
+    app.serve self
 end
 
 app.run
