@@ -47,10 +47,21 @@ module Vault
     end
 
     ##
+    # Checks out a dataset for special options
+    def self.revise_dataset(data)
+        if data.key? 'todo!'
+            raise 'TODO: ' + data['todo!']
+        elsif data.key? :'todo!'
+            raise 'TODO: ' + data[:'todo!']
+        end
+    end
+
+    ##
     # Merges all the datasets and in case of conflict those on the left have preference
     def self.from(*names)
         res = {}
         names.map { |name| @@data[name] }.each { |v| res.merge! v unless v.nil? }
+        self.revise_dataset(res)
         res
     end
 
@@ -59,6 +70,7 @@ module Vault
     def self.select(*names)
         names.reverse_each do |k|
             if @@data.key? k
+                self.revise_dataset(@@data[k])
                 return @@data[k]
             end
         end
