@@ -3,3 +3,4 @@ public/*
 
 #Avoid ignore welcome files ;)
 !public/welcome.*
+**/*.local.*

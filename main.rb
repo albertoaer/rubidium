@@ -7,6 +7,7 @@ require_relative 'lib/renderers/markdown'
 require_relative 'lib/renderers/raw'
 require_relative 'lib/renderers/controller'
 require_relative 'lib/renderers/erb_template'
+require_relative 'lib/vault'
 
 app = App.new
 
@@ -28,7 +29,7 @@ Renderer.new do
 end
 
 Server.new do
-    setup ip: 'localhost'
+    setup **Vault.from('server', 'server.local') #Load config from server and local server
     app.include self
 end
 
