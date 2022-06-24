@@ -1,3 +1,3 @@
-def render req
-    '<h1>Welcome from a ruby controller</h1>'
+def get req
+    [:html, '<h1>Welcome from a Ruby controller</h1>']
 end

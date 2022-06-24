@@ -1,21 +1,22 @@
 class RawRenderer
-    def render(file)
-        ext = File.extname file
-        return yield(:file, file), ext_repr(ext)
+    def render(request)        
+        ["Content-Type: #{content_type request.ext}\r\n",
+        "\r\n",
+        yield(:file, request.route)]
     end
 
-    private
-
-    def ext_repr(ext)
+    def content_type(ext)
         case ext
-        when ".html"
+        when :html
             "text/html"
-        when ".js"
+        when :js
             "text/javascript"
-        when ".css"
+        when :css
             "text/css"
-        when ".txt"
+        when :txt
             "text/plain"
+        when :json
+            "application/json"
         end
     end
 end

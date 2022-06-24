@@ -22,22 +22,21 @@ class Renderer < Service
         use(renderer, *extensions)
     end
 
-    def render(file)
-        ext = (File.extname file)[1..-1]
-        renderer = get_renderer_for(ext)
+    def render(request)
+        renderer = get_renderer_for(request.ext)
         unless renderer.nil?
-            renderer.render(file) { |*args| @request.call(*args) }
+            renderer.render(request, &@services)
         else
-            puts "No render found for extension: #{ext}"
+            puts "No render found for extension: #{request.ext}"
         end
     end
 
-    def call(&request) @request = request end
+    def call(&services) @services = services end
 
     private
 
     def get_renderer_for(ext)
         return @routing_renderer if ext.nil?
-        return @renderers[ext.to_sym]
+        return @renderers[ext]
     end
 end
