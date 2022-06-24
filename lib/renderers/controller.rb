@@ -14,12 +14,7 @@ class ControllerRenderer < RawRenderer
     end
 
     def render(request)
-        src = case request.ext
-        when :rb
-            filedata = yield :file, request.route
-        when nil
-            filedata = yield :file, request.route + '.rb'
-        end
-        solve_response controlled_execution(filedata, request)
+        src = yield :file, request.path
+        solve_response controlled_execution(src, request)
     end
 end

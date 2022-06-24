@@ -1,6 +1,6 @@
 class RawRenderer
-    def render(request)        
-        ["Content-Type: #{content_type request.ext}", yield(:file, request.route)]
+    def render(request)     
+        ["Content-Type: #{content_type request.ext}", yield(:file, request.path)]
     end
 
     def content_type(ext)

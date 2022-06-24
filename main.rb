@@ -13,7 +13,9 @@ app = App.new
 FileInspector.new do
     elapse 0.1
     track "./public"
-    app.include self, file: :request
+    @route_ext = [ :rb, :erb ]
+    @no_route_ext = [ :html, :js, :css, :md ]
+    app.include self, file: :request, solve_route: :solve_route
 end
 
 Renderer.new do
@@ -21,7 +23,7 @@ Renderer.new do
     use MarkdownRenderer.new, :md
     use RawRenderer.new, :css, :js, :txt
     use ERBRenderer.new, :erb
-    router ControllerRenderer.new, :rb
+    use ControllerRenderer.new, :rb
     app.include self, render: :render
 end
 

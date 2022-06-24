@@ -23,9 +23,7 @@ class Server < Service
         while client = @server.accept
             petition = Proc.new do
                 request_input = client.readpartial(2048)
-                request = Request.new(request_input, &services)
-
-                response = get_response(request, &services)
+                response = get_response(request_input, &services)
                 write_response(response, &client.method(:print))
 
                 client.close
@@ -36,8 +34,9 @@ class Server < Service
 
     private
 
-    def get_response(request)
+    def get_response(request_input, &services)
         begin
+            request = Request.new(request_input, &services)
             res = yield :render, request
             if res.first == :redirect
                 ["HTTP/1.1 302 Redirect", "Location: #{res.last}", ""]

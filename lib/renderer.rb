@@ -18,11 +18,6 @@ class Renderer < Service
         end
     end
 
-    def router(renderer, *extensions)
-        @routing_renderer = renderer
-        use(renderer, *extensions)
-    end
-
     def render(request)
         renderer = get_renderer_for(request.ext)
         unless renderer.nil?
@@ -37,7 +32,6 @@ class Renderer < Service
     private
 
     def get_renderer_for(ext)
-        return @routing_renderer if ext.nil?
         return @renderers[ext]
     end
 end

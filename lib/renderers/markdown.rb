@@ -7,6 +7,6 @@ class MarkdownRenderer < RawRenderer
     end
 
     def render(request)
-        ["Content-Type: text/html", @markdown.render(yield :file, request.route)]
+        ["Content-Type: text/html", @markdown.render(yield :file, request.path)]
     end
 end
