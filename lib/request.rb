@@ -2,6 +2,7 @@ class Request
     attr_reader :lines, :method, :version, :attributes, :route, :ext
 
     def initialize(input, &block)
+        @raw = input
         @lines = input.split("\r\n")
         @method, @route, @version = @lines[0].split(' ')
         @attributes = @lines[1..-1].map { |field| field.split(': ') if field.length() > 0 }
@@ -12,5 +13,10 @@ class Request
 
     def service(*args, **kwargs, &block)
         @services.call *args, **kwargs, &block
+    end
+
+    def fetch(file)
+        r = Request.new("GET #{file} #{@version}\r\n\r\n", &@services)
+        service :render, r
     end
 end
