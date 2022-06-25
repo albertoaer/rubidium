@@ -1,8 +1,8 @@
 require_relative '../response'
 
 class RawRenderer
-    def render(request)
-        Response.new 200, 'Ok', yield(:file, request.path), 'Content-Type' => (content_type request.ext)
+    def render(req)
+        Response.new 200, 'Ok', yield(:file, req.path), 'Content-Type' => (content_type req.ext)
     end
 
     def content_type(ext)

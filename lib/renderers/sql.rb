@@ -8,9 +8,9 @@ class SqlRenderer < RawRenderer
         @conn = PG.connect **config
     end
 
-    def render(request)
-        src = yield :file, request.path
-        result = @conn.exec_params(src, request.params)
+    def render(req)
+        src = yield :file, req.path
+        result = @conn.exec_params(src, req.params)
         json = get_json(result)
         Response.ok json, 'Content-Type' => 'application/json'
     end

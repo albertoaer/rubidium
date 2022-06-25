@@ -2,10 +2,10 @@ require_relative 'raw'
 require_relative '../httperror'
 require_relative '../response'
 
-def controlled_execution(file, request)
+def controlled_execution(file, req)
     x = binding
     x.eval file
-    return x.method(request.req_method.downcase).call(request)
+    return x.method(req.req_method.downcase).call(req)
 end
 
 class ControllerRenderer < RawRenderer
@@ -15,8 +15,8 @@ class ControllerRenderer < RawRenderer
         Response.ok res.last, 'Content-Type' => content_type(res.first)
     end
 
-    def render(request)
-        src = yield :file, request.path
-        solve_response controlled_execution(src, request)
+    def render(req)
+        src = yield :file, req.path
+        solve_response controlled_execution(src, req)
     end
 end
