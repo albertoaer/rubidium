@@ -1,3 +1,4 @@
+require 'concurrent'
 require_relative 'service'
 require_relative 'httperror'
 
@@ -38,11 +39,10 @@ class FileInspector < Service
     def initialize(&block)
         @target = []
         @elapse_time = nil
-        @records = {} #Files recorded in memory
+        @records = Concurrent::Map.new #Files recorded in memory
         @tree = {} #Mapped routes with real files
         @route_ext = {} #Extensions allowed to be accessed by route
         @no_route_ext = {} #Extensions allowed to direct access
-        @mutex = Mutex.new
         super(&block)
         map_tree
     end
@@ -131,7 +131,7 @@ class FileInspector < Service
     ## Virtual name without extension, a hidden file's name would be empty String
     def v_name(current)
         name = File.basename('_' + current, '.*')[1..-1]
-        name.length == 0 ? nil : name
+        name.empty? ? nil : name
     end
 
     ## Virtual extension, even hidden files are treat as extensions
@@ -145,9 +145,7 @@ class FileInspector < Service
 
     def request(file, revision=true)
         raise "Inspecting no folder" if target.nil?
-        updated = nil
-        @mutex.synchronize { updated = inspect(file, !revision) }
-        return updated
+        inspect(file, !revision)
     end
 
     def close(filename)
@@ -178,9 +176,7 @@ class FileInspector < Service
     def call
         while true
             sleep @elapse_time unless @elapse_time.nil?
-            @mutex.synchronize do
-                @records.each_key { |filename| inspect(filename, false) }
-            end
+            @records.each_key { |filename| inspect(filename, false) }
         end
     end
 end
