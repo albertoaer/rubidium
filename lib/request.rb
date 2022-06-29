@@ -1,3 +1,5 @@
+require_relative './attributes/http_attributes'
+
 class Request
     attr_reader :lines, :req_method, :version, :attributes, :route, :query, :ext, :path, :params, :resolved
 
@@ -7,7 +9,7 @@ class Request
         @req_method, route, @version = @lines[0].split(' ')
         @route, query = route.split('?')
         @query = query&.split(/[\;,&]/)&.map { |v| get_query_pair(v) }&.to_h
-        @attributes = @lines[1..-1].map { |field| field.split(': ') if field.length > 0 }
+        @attributes = HTTPAttributes.from_raw @lines[1..-1]
         @services = block
         @resolved = false
     end

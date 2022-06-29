@@ -1,10 +1,12 @@
+require_relative './attributes/http_attributes'
+
 class Response
     attr_accessor :code, :concept, :attributes, :body
     
     def initialize(code, concept, body=nil, **attributes)
         @code = code
         @concept = concept
-        @attributes = attributes
+        @attributes = HTTPAttributes.from_kv attributes
         @body = body
     end
 
@@ -19,14 +21,6 @@ class Response
     def self.to(location, code=302, **attributes)
         attributes['Location'] = location
         Response.new 302, 'Redirect', **attributes
-    end
-
-    def [](att)
-        @attributes[att]
-    end
-
-    def []=(att, val)
-        @attributes[att] = val
     end
 
     def write(version)
