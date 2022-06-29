@@ -1,7 +1,7 @@
 require 'socket'
 require_relative 'service'
 require_relative 'request'
-require_relative 'httperror'
+require_relative 'http_error'
 require_relative './middleware/middleware'
 
 class Server < Service

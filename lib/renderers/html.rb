@@ -1,6 +1,6 @@
 require 'nokogiri'
 require_relative 'raw'
-require_relative '../httperror'
+require_relative '../http_error'
 
 class HTMLRenderer < RawRenderer
     def render(req)

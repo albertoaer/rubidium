@@ -1,5 +1,5 @@
 require_relative 'raw'
-require_relative '../httperror'
+require_relative '../http_error'
 require_relative '../response'
 
 def controlled_execution(file, req)
