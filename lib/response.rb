@@ -20,7 +20,7 @@ class Response
 
     def self.to(location, code=302, **attributes)
         attributes['Location'] = location
-        Response.new 302, 'Redirect', **attributes
+        Response.new code, 'Redirect', **attributes
     end
 
     def write(version)
