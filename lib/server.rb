@@ -52,6 +52,7 @@ class Server < Service
         begin
             @services.call :render, request
         rescue HTTPError => e
+            puts e.inspect
             e.as_response
         end
     end
