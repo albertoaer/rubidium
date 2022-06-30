@@ -34,12 +34,18 @@ class Server < Service
         puts "Listenning on #{@config[:ip]}:#{@config[:port]}"
         @server = TCPServer.new @config[:ip], @config[:port]
 
-        while client = @server.accept
+        loop do
+            client = @server.accept
             petition = Proc.new do
-                request_input = client.readpartial 2048
-                request = Request.new request_input, &@services
-                response = get_response request
-                response.write 'HTTP/1.1', &client.method(:print)
+                keep_alive = true
+                while keep_alive
+                    request_input = client.readpartial 2048
+                    request = Request.new request_input, &@services
+                    keep_alive = request.headers.get('Connection')&.strip&.downcase == 'keep-alive'
+                    response = get_response request
+                    response.headers.include 'Connection', 'keep-alive' if keep_alive
+                    response.write 'HTTP/1.1', &client.method(:print)
+                end
                 client.close
             end
             @services.call :launch, petition
