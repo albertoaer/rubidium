@@ -21,8 +21,8 @@ class App
         primitives.each { |key, val| @primitives[key] = utility.method(val) }
     end
 
-    def run(threads=5)
-        @pool = Concurrent::FixedThreadPool.new threads
+    def run(**config)
+        @pool = Concurrent::ThreadPoolExecutor.new **config
         @services.each { |service| launch service }
         @pool.wait_for_termination
     end

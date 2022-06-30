@@ -42,4 +42,4 @@ Server.new do
     app.serve self
 end
 
-app.run
+app.run **Vault.from('app')

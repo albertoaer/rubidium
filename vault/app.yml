@@ -1,0 +1,3 @@
+min_threads: 10
+max_threads: 100
+max_queue: 100
