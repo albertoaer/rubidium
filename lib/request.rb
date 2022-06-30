@@ -1,7 +1,7 @@
-require_relative './attributes/http_attributes'
+require_relative './headers/http_headers'
 
 class Request
-    attr_reader :lines, :req_method, :version, :attributes, :route, :query, :ext, :path, :params, :resolved
+    attr_reader :lines, :req_method, :version, :headers, :route, :query, :ext, :path, :params, :resolved
 
     def initialize(input, &block)
         @raw = input
@@ -10,7 +10,7 @@ class Request
         @route, query = route.split('?')
         @query = query&.split(/[\;,&]/)&.map { |v| get_query_pair(v) }&.to_h
         @query = {} if @query.nil?
-        @attributes = HTTPAttributes.from_raw @lines[1..-1]
+        @headers = HTTPHeaders.from_raw @lines[1..-1]
         @services = block
         @resolved = false
     end

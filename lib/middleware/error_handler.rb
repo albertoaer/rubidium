@@ -19,7 +19,7 @@ class ErrorHandler
             if nres.code < 400 and nres.code > 299
                 nres
             else
-                res.attributes = nres.attributes
+                res.headers = nres.headers
                 res.body = nres.body
                 res
             end

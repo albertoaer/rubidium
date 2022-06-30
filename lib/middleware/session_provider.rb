@@ -11,7 +11,7 @@ class SessionProvider
     end
 
     def before(req)
-        id = req.attributes.list_kv_val('Cookie', @name, ';', '=')
+        id = req.headers.list_kv_val('Cookie', @name, ';', '=')
         id = nil unless @active_sessions.key? id
         active_sessions = @active_sessions
         req.define_singleton_method(:session_id) { id }
@@ -29,6 +29,6 @@ class SessionProvider
     end
 
     def after(req, res)
-        res.attributes.include 'Set-Cookie', "#{@name}=#{req.session_id}" unless req.session_id.nil?
+        res.headers.include 'Set-Cookie', "#{@name}=#{req.session_id}" unless req.session_id.nil?
     end
 end
