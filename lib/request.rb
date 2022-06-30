@@ -9,6 +9,7 @@ class Request
         @req_method, route, @version = @lines[0].split(' ')
         @route, query = route.split('?')
         @query = query&.split(/[\;,&]/)&.map { |v| get_query_pair(v) }&.to_h
+        @query = {} if @query.nil?
         @attributes = HTTPAttributes.from_raw @lines[1..-1]
         @services = block
         @resolved = false
