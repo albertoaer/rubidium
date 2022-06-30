@@ -1,4 +1,5 @@
 require 'concurrent'
+require 'json'
 require_relative 'service'
 require_relative 'http_error'
 
@@ -64,9 +65,8 @@ class FileInspector < Service
         @target.each { |t| opened_dirs << [t, @tree] }
         while opened_dirs.size > 0
             orig = opened_dirs.pop
-            Dir.entries(orig[0]).each do |f|
+            get_elements(orig[0]).each do |f, rpath|
                 next if f == '.' or f == '..' # Exclude ., ..
-                rpath = File.join orig[0], f
                 vessel, name, data = if File.directory? rpath
                     childs = {}
                     opened_dirs << [rpath, childs]
@@ -88,6 +88,22 @@ class FileInspector < Service
         end
     end
 
+    ## Get the elements on a folder and the real path, also maps virtual routes as real files in presence of '.virtuals.json'
+    # virtual-routes.json example:
+    # {
+    #    "virtual name (.ext?)": "real name (.ext?)"
+    #    ...
+    #}
+    def get_elements(folder)
+        virtuals = File.join(folder, '.virtuals.json')
+        if File.file? virtuals
+            JSON.load_file(virtuals).map { |k,v| [k, File.join(folder, v)] }
+        else
+            Dir.entries(folder).map { |f| [f, File.join(folder, f)] }
+        end
+    end
+
+    ## Solves a given route based on the mapped file tree
     def solve_route(route)
         path = route.split('/').filter { |p| p.length > 0 }
 
