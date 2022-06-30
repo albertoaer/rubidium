@@ -17,15 +17,16 @@ app = App.new
 FileInspector.new do
     elapse 0.1
     track "./public"
+    track "./exposed/pwa" if Vault.select('manifest.shared')[:pwa]
     @route_ext = [ :rb, :erb, :sql ]
-    @no_route_ext = [ :html, :js, :css, :md ]
+    @no_route_ext = [ :html, :js, :css, :md, :json, :png ]
     app.serve self, file: :request, solve_route: :solve_route
 end
 
 Renderer.new do
     use HTMLRenderer.new, :html
     use MarkdownRenderer.new, :md
-    use RawRenderer.new, :css, :js, :txt
+    use RawRenderer.new, :css, :js, :txt, :json, :png
     use ERBRenderer.new, :erb
     use ControllerRenderer.new, :rb
     use SqlRenderer.new(**Vault.select('db', 'db.local')), :sql
@@ -36,8 +37,6 @@ app.provide SharedPrefs.new, pref: :get_pref
 
 Server.new do
     setup **Vault.from('server', 'server.local') #Load config from server and local server
-    before { |req| puts "#{req} came" }
-    after { |req, res| puts "#{res} went" }
     use SessionProvider.new :sesion
     use ErrorRedirect.new('/todo.md', 404), :after
     app.serve self

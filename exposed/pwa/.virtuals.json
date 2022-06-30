@@ -1,0 +1,5 @@
+{
+    "icons": "icons",
+    "service-worker.js": "service-worker.js",
+    "manifest.json": "generate-manifest.rb"
+}

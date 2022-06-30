@@ -1,0 +1,6 @@
+pwa: true
+manifest:
+  name: Rubidium PWA
+  short_name: Rubidium
+  start_url: ./?home
+  display: standalone
