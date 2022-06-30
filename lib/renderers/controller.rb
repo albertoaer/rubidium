@@ -3,9 +3,9 @@ require_relative '../http_error'
 require_relative '../response'
 
 def controlled_execution(file, req)
-    x = binding
-    x.eval file
-    return x.method(req.req_method.downcase).call(req)
+    runenv = binding
+    runenv.eval file, req.path
+    return runenv.method(req.req_method.downcase).call(req)
 end
 
 class ControllerRenderer < RawRenderer
