@@ -10,7 +10,7 @@ class FileRecord
     def initialize(filename)
         @filename = filename
         @time = File.mtime(filename)
-        @data = File.read(filename)
+        @data = File.read(filename, mode: 'rb')
         @followers = 1
     end
 
@@ -19,7 +19,7 @@ class FileRecord
     def update
         previous = @time
         if previous != (@time = File.mtime(@filename))
-            @data = File.read(@filename)
+            @data = File.read(@filename, mode: 'rb')
         end
     end
 
