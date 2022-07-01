@@ -2,6 +2,7 @@ require 'json'
 require 'pathname'
 
 def get req
+    req.save_response :routing
     def iconsz img
         File.read(img, mode: 'rb')[0x10..0x18].unpack('NN').join('x')
     end
