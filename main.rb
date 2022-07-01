@@ -11,6 +11,7 @@ require_relative 'lib/renderers/sql'
 require_relative 'lib/vault'
 require_relative 'lib/middleware/error_redirect'
 require_relative 'lib/middleware/session_provider'
+require_relative 'lib/middleware/response_cache'
 
 app = App.new
 
@@ -38,6 +39,7 @@ app.provide SharedPrefs.new, pref: :get_pref
 Server.new do
     setup **Vault.from('server', 'server.local') #Load config from server and local server
     use SessionProvider.new :sesion
+    use ResponseCache.new :routing
     use ErrorRedirect.new('/todo.md', 404), :after
     app.serve self
 end
