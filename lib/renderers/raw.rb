@@ -10,10 +10,15 @@ class RawRenderer
     end
 
     def render(req)
+        obligatory_only(req)
         Response.new 200, 'Ok', yield(:file, req.path), 'Content-Type' => (content_type req.ext)
     end
 
     def content_type(ext)
         @@types[ext]
+    end
+
+    def obligatory_only(req)
+        raise HTTPError.new 405, 'Method not allowed' unless req.obligatory_method?
     end
 end

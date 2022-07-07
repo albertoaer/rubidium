@@ -5,7 +5,14 @@ require_relative '../response'
 def controlled_execution(file, req)
     runenv = binding
     runenv.eval file, req.path
-    return runenv.method(req.req_method.downcase).call(req)
+    method = req.req_method.downcase
+    method = 'get' if method == 'head'
+    controller = runenv.method(method)
+    unless controller.nil?
+        controller.call(req)
+    else
+        raise HTTPError.new 405, 'Method not allowed'
+    end
 end
 
 class ControllerRenderer < RawRenderer

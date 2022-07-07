@@ -9,6 +9,7 @@ class SqlRenderer < RawRenderer
     end
 
     def render(req)
+        obligatory_only(req)
         src = yield :file, req.path
         result = @conn.exec_params(src, req.params)
         json = get_json(result)

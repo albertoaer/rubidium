@@ -4,6 +4,7 @@ require_relative '../http_error'
 
 class HTMLRenderer < RawRenderer
     def render(req)
+        obligatory_only(req)
         res = super req
         validate_html res.body
         res

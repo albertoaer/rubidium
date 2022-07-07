@@ -7,7 +7,8 @@ class MarkdownRenderer < RawRenderer
         @markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true)
     end
 
-    def render(req)        
+    def render(req)
+        obligatory_only(req)
         Response.ok @markdown.render(yield :file, req.path), 'Content-Type' => 'text/html'
     end
 end
