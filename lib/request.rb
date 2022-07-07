@@ -14,7 +14,7 @@ class Request
         @services = block
         @resolved = false
     end
-    
+
     ##
     # Resolve a request is the only operation that can cause an exception, so it's handled separately
     def resolve!
@@ -33,6 +33,14 @@ class Request
 
     def get_binding
         binding
+    end
+    
+    def obligatory_method?
+        req_method == 'GET' or req_method == 'HEAD' 
+    end
+
+    def bodiless_response?
+        req_method == 'HEAD'
     end
 
     private

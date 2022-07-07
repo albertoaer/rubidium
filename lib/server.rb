@@ -44,7 +44,7 @@ class Server < Service
                     keep_alive = request.headers.get('Connection')&.strip&.downcase == 'keep-alive'
                     response = get_response request
                     response.headers.include 'Connection', 'keep-alive' if keep_alive
-                    response.write 'HTTP/1.1', &client.method(:print)
+                    response.write 'HTTP/1.1', request.bodiless_response?, &client.method(:print)
                 end
                 client.close
             end
