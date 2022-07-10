@@ -12,6 +12,7 @@ require_relative 'lib/vault'
 require_relative 'lib/middleware/error_redirect'
 require_relative 'lib/middleware/session_provider'
 require_relative 'lib/middleware/response_cache'
+require_relative 'lib/authentication'
 
 app = App.new
 
@@ -33,6 +34,8 @@ Renderer.new do
     use SqlRenderer.new(**Vault.select('db', 'db.local')), :sql
     app.provide self, render: :render
 end
+
+app.provide Authentication.new(:internal, :all), is_permission?: :permission_exists?, allow?: :permission_allow?
 
 app.provide SharedPrefs.new, pref: :get_pref
 
