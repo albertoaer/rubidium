@@ -1,7 +1,7 @@
 require 'concurrent'
 require 'json'
 require_relative 'service'
-require_relative 'http_error'
+require_relative '../http_error'
 
 class FileRecord
     attr_reader :data

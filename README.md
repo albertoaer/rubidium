@@ -32,7 +32,7 @@ All the servicies and utilities are loaded into the application at [main.rb](./m
 
 Public files served by the application server are located at [public](./public) folder
 
-If you notice the lack of a renderer or want a custom one, add it to the [renderers](./lib/renderers) folder and `use` it at the Renderer in the [main](./main.rb) application file for an extension
+If you notice the lack of a renderer or want a custom one, add it to the [renderers](./lib/services/renderers) folder and `use` it at the Renderer in the [main](./main.rb) application file for an extension
 
 ## Features already included
 - Routing system of mounted folders like *./public*

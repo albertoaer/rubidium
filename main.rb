@@ -1,7 +1,7 @@
-require_relative 'lib/server'
-require_relative 'lib/file_inspector'
+require_relative 'lib/services/server'
+require_relative 'lib/services/file_inspector'
 require_relative 'lib/app'
-require_relative 'lib/renderer'
+require_relative 'lib/services/renderer'
 require_relative 'lib/renderers/html'
 require_relative 'lib/renderers/markdown'
 require_relative 'lib/renderers/raw'
@@ -12,7 +12,7 @@ require_relative 'lib/vault'
 require_relative 'lib/middleware/error_redirect'
 require_relative 'lib/middleware/session_provider'
 require_relative 'lib/middleware/response_cache'
-require_relative 'lib/authentication'
+require_relative 'lib/services/authentication'
 
 app = App.new
 

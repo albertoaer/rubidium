@@ -1,4 +1,4 @@
-require_relative '../lib/authentication'
+require_relative '../lib/services/authentication'
 
 describe Authentication do
     auth = Authentication.new(:internal, :admin, :user, :all)

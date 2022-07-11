@@ -1,5 +1,5 @@
-require_relative 'http_error'
 require_relative 'service'
+require_relative '../http_error'
 
 class Renderer < Service    
     def initialize(&block)
