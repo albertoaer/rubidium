@@ -35,12 +35,17 @@ class FileInspector < Service
     policy :restart
     policy :inspect
 
-    attr_reader :target, :records, :route_ext, :no_route_ext
+    attr_reader :target, :records, :route_ext, :no_route_ext, :tree
 
     def initialize(&block)
         @target = []
         @elapse_time = nil
         @records = Concurrent::Map.new #Files recorded in memory
+        @treenode = Struct.new(:path, :auth, :childs) do
+            def directory?
+                childs.class == Hash
+            end
+        end
         @tree = {} #Mapped routes with real files
         @route_ext = {} #Extensions allowed to be accessed by route
         @no_route_ext = {} #Extensions allowed to direct access
@@ -60,9 +65,10 @@ class FileInspector < Service
     ## Routing methods
 
     def map_tree
-        @tree = {} #Mapped routes with real files
+        treecontent = {}
+        @tree = @treenode.new(nil, :all, treecontent) #Mapped routes with real files
         opened_dirs = []
-        @target.each { |t| opened_dirs << [t, @tree] }
+        @target.each { |t| opened_dirs << [t, treecontent] }
         while opened_dirs.size > 0
             orig = opened_dirs.pop
             get_elements(orig[0]).each do |f, rpath|
@@ -70,16 +76,16 @@ class FileInspector < Service
                 vessel, name, data = if File.directory? rpath
                     childs = {}
                     opened_dirs << [rpath, childs]
-                    [orig[1], f, childs]
+                    [orig[1], f, @treenode.new(rpath, :all, childs)]
                 else
                     name = v_name f
                     ext = v_ext(f)
                     if name.nil?
-                        [orig[1], ext, rpath]
+                        [orig[1], ext, @treenode.new(rpath, :all, nil)]
                     elsif orig[1].key? name
-                        [orig[1][name], ext, rpath]
+                        [orig[1][name], ext, @treenode.new(rpath, :all, nil)]
                     else
-                        [orig[1], name, {ext => rpath}]
+                        [orig[1], name, @treenode.new(rpath, :all, {ext => @treenode.new(rpath, :all, nil)})]
                     end
                 end
                 raise "Collision detected for tree name '#{name}' on: #{rpath}" if vessel.key? name
@@ -107,6 +113,7 @@ class FileInspector < Service
     def solve_route(route)
         path = route.split('/').filter { |p| p.length > 0 }
 
+        #Parse route as path
         if path.length > 0
             name, ext = v_divide path.pop
             path << name unless name.nil?
@@ -120,23 +127,30 @@ class FileInspector < Service
 
         current = @tree
         params = []
+
+        #Match all path parts
         path.each do |part|
-            if current.key? part
-                current = current[part]
-            elsif current.key? '$'
-                current = current['$']
+            if current.childs.key? part
+                current = current.childs[part]
+            elsif current.childs.key? '$'
+                current = current.childs['$']
                 params << part
             else
                 raise HTTPError.new 404, "No file found on the tree: #{route}"
             end
         end
-        if current.class != String
-            # Unexpected behave for multiple route extensions in the same folder
-            current = current.find { |file| @route_ext.include? file[0] }&.[](1)
+
+        #Solve routed extensions
+        if current.directory?
+            pp current
+            # Unexpected behave when multiple routed extensions are childs of the same name
+            current = current.childs.find { |file| @route_ext.include? file[0] }&.[](1)
+            #File not found for null child
+            raise HTTPError.new 404, "No file found on the tree: #{route}" if current.nil?
             #If a folder or nil is returned, raise and HTTP error
-            raise HTTPError.new 403, "Trying to access internal folder" if current.class != String
+            raise HTTPError.new 403, "Trying to access internal folder" if current.directory?
         end
-        return current, v_ext(current), params # path, extension, params
+        return current.path, v_ext(current.path), params # path, extension, params
     end
 
     ## Returns virtual name and extension
@@ -157,6 +171,8 @@ class FileInspector < Service
         ext.nil? ? nil : ext.to_sym
     end
     
+    private :map_tree, :get_elements, :v_divide, :v_name, :v_ext
+
     ## File methods
 
     def request(file, revision=true)
@@ -188,6 +204,8 @@ class FileInspector < Service
             raise HTTPError.new 404, 'File not found'
         end
     end
+
+    private :close, :inspect
 
     def call
         while true
