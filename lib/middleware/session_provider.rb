@@ -2,33 +2,94 @@ require 'concurrent'
 require 'securerandom'
 require_relative 'middleware'
 
+class SessionStorage
+    def initialize
+        @active_sessions = Concurrent::Map.new
+        @content_struct = Struct.new('SessionContent', :data, :auth)
+    end
+
+    def create
+        id = SecureRandom.uuid
+        content = @content_struct.new nil, :all
+        @active_sessions[id] = content
+        [id, content]
+    end
+
+    def clean_id(id)
+        return id if @active_sessions.key? id
+        #Returns nil by default
+    end
+
+    def [](id)
+        @active_sessions[id]
+    end
+
+    def delete(id)
+        @active_sessions.delete(id)
+    end
+end
+
+class Session
+    attr_reader :id
+    
+    def initialize(id, req, storage)
+        @id = id
+        @content = storage[@id]
+        @storage = storage
+        @services = req.services
+    end
+
+    def data
+        raise 'No active session' if @id.nil?
+        return @content.data
+    end
+
+    def data=(value)
+        raise 'No active session' if @id.nil?
+        @content.data = value
+    end
+
+    def auth
+        raise 'No active session' if @id.nil?
+        return @content.auth
+    end
+
+    def auth=(value)
+        raise 'No active session' if @id.nil?
+        raise 'Invalid permission level' unless @services.call :is_permission?, value
+        @content.auth = value
+    end
+
+    def new
+        close
+        @id, @content = @storage.create
+    end
+
+    def close
+        #Wont care if there is no active session since reusability and error prevention
+        @storage.delete @id
+        @id = nil
+        @content = nil
+    end
+end
+
 class SessionProvider
     include Middleware
 
+    attr_reader :name, :storage
+
     def initialize(name)
         @name = name.to_s #the name, for example: id, sId, session, etc...
-        @active_sessions = Concurrent::Map.new
+        @storage = SessionStorage.new
     end
 
     def before(req)
-        id = req.headers.list_kv_val('Cookie', @name, ';', '=')
-        id = nil unless @active_sessions.key? id
-        active_sessions = @active_sessions
-        req.define_singleton_method(:session_id) { id }
-        req.define_singleton_method(:session) { active_sessions[id] if active_sessions.key? id }
-        req.define_singleton_method(:write_session) { |credentials| active_sessions[id] = credentials if active_sessions.key? id }
-        req.define_singleton_method(:new_session) do |credentials|
-            active_sessions.delete(id) if active_sessions.key? id
-            id = SecureRandom.uuid
-            active_sessions[id] = credentials
-        end
-        req.define_singleton_method(:close_session) do
-            active_sessions.delete(id) if active_sessions.key? id
-            id = nil
-        end
+        id = @storage.clean_id req.headers.list_kv_val('Cookie', @name, ';', '=')
+        session = Session.new id, req, @storage
+        req.define_singleton_method(:session) { session }
     end
 
     def after(req, res)
-        res.headers.include 'Set-Cookie', "#{@name}=#{req.session_id}" unless req.session_id.nil?
+        res.headers.include 'Set-Cookie', "#{@name}=#{req.session.id}" unless req.session.id.nil?
     end
 end
