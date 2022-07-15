@@ -1,7 +1,7 @@
 require_relative './headers/http_headers'
 
 class Request
-    attr_reader :lines, :req_method, :version, :headers, :route, :query, :ext, :path, :params, :resolved
+    attr_reader :lines, :req_method, :version, :headers, :route, :query, :ext, :path, :params, :services, :resolved
 
     def initialize(input, &block)
         @raw = input
