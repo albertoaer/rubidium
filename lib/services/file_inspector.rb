@@ -142,7 +142,6 @@ class FileInspector < Service
 
         #Solve routed extensions
         if current.directory?
-            pp current
             # Unexpected behave when multiple routed extensions are childs of the same name
             current = current.childs.find { |file| @route_ext.include? file[0] }&.[](1)
             #File not found for null child
