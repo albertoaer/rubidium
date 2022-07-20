@@ -28,6 +28,10 @@ class Renderer < Service
         end
     end
 
+    def exports
+        { render: :render }
+    end
+
     private
 
     def get_renderer_for(ext)

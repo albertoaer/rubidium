@@ -95,6 +95,10 @@ class SharedPrefs
         s = Vault.from(*@@shared)
         s[name] unless s.nil?
     end
+
+    def exports
+        { pref: :get_pref }
+    end
 end
 
 if File.directory? 'vault'

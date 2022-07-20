@@ -25,10 +25,19 @@ class Service
         instance_exec &block if block_given?
     end
 
+    ##
+    # Grant the service a function to call primitives from other services
     def set_services(&services)
         @services = services
     end
 
+    ##
+    # Allow the service tell which default primitives exports
+    def exports
+    end
+
+    ##
+    # Called to run the service main loop
     def call
     end
 end

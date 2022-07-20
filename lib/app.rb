@@ -25,6 +25,8 @@ class App
     ## An utility only provides primitives to the services
     def provide(utility, **primitives)
         utility.set_services &@fn_services if utility.respond_to?(:set_services)
+        exports = utility.exports
+        primitives.merge!(exports) unless exports.nil?
         primitives.each { |key, val| @primitives[key] = utility.method(val) }
     end
 

@@ -18,4 +18,8 @@ class Authentication < Service
     def permission_allow?(ref_auth, auth)
         (@permissions.index(ref_auth) or -1) >= (@permissions.index(auth) or @permissions.length)
     end
+
+    def exports
+        { is_permission?: :permission_exists?, allow?: :permission_allow? }
+    end
 end

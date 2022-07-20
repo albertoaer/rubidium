@@ -206,6 +206,10 @@ class FileInspector < Service
 
     private :close, :inspect
 
+    def exports
+        { file: :request, solve_route: :solve_route }
+    end
+    
     def call
         while true
             sleep @elapse_time unless @elapse_time.nil?

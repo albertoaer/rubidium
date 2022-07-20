@@ -22,7 +22,7 @@ FileInspector.new do
     track "./exposed/pwa" if Vault.select('manifest.shared')[:pwa]
     @route_ext = [ :rb, :erb, :sql ]
     @no_route_ext = [ :html, :js, :css, :md, :json, :png ]
-    app.serve self, file: :request, solve_route: :solve_route
+    app.serve self
 end
 
 Renderer.new do
@@ -32,12 +32,12 @@ Renderer.new do
     use ERBRenderer.new, :erb
     use ControllerRenderer.new, :rb
     use SqlRenderer.new(**Vault.select('db', 'db.local')), :sql
-    app.provide self, render: :render
+    app.provide self
 end
 
-app.provide Authentication.new(:internal, :all), is_permission?: :permission_exists?, allow?: :permission_allow?
+app.provide Authentication.new(:internal, :all)
 
-app.provide SharedPrefs.new, pref: :get_pref
+app.provide SharedPrefs.new
 
 Server.new do
     setup **Vault.from('server', 'server.local') #Load config from server and local server
