@@ -7,7 +7,6 @@ class ERBRenderer < HTMLRenderer
         obligatory_only(req)
         template = ERB.new yield(:file, req.path)
         res = Response.ok template.result(req.get_binding), 'Content-Type' => 'text/html'
-        validate_html res.body
-        res
+        process_html res
     end
 end
