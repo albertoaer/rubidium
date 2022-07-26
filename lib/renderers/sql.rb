@@ -1,17 +1,12 @@
-require 'pg'
 require 'json'
 require_relative 'raw'
 require_relative '../response'
 
 class SqlRenderer < RawRenderer
-    def initialize(**config)
-        @conn = PG.connect **config
-    end
-
     def render(req)
         obligatory_only(req)
         src = yield :file, req.path
-        result = @conn.exec_params(src, req.params)
+        result = yield :sql_query, src, req.params
         json = get_json(result)
         Response.ok json, 'Content-Type' => 'application/json'
     end

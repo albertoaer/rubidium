@@ -14,6 +14,7 @@ require_relative 'lib/middleware/error_redirect'
 require_relative 'lib/middleware/session_provider'
 require_relative 'lib/middleware/response_cache'
 require_relative 'lib/services/authentication'
+require_relative 'lib/services/postgresql_connector'
 
 app = App.new
 
@@ -33,9 +34,11 @@ Renderer.new do
     use RawRenderer.new, :css, :js, :txt, :json, :png
     use ERBRenderer.new, :erb
     use ControllerRenderer.new, :rb
-    use SqlRenderer.new(**Vault.select('db', 'db.local')), :sql
+    use SqlRenderer.new, :sql
     app.provide self
 end
+
+app.serve PostgreSQLConnector.new(**Vault.select('db', 'db.local'))
 
 app.provide Authentication.new(:internal, :all)
 
