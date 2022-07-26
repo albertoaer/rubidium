@@ -1,5 +1,6 @@
 require_relative 'lib/services/server'
-require_relative 'lib/services/file_inspector'
+require_relative 'lib/services/file_cache'
+require_relative 'lib/services/router'
 require_relative 'lib/app'
 require_relative 'lib/services/renderer'
 require_relative 'lib/renderers/html'
@@ -16,10 +17,11 @@ require_relative 'lib/services/authentication'
 
 app = App.new
 
-FileInspector.new do
-    elapse 0.1
-    track "./public"
-    track "./exposed/pwa" if Vault.select('manifest.shared')[:pwa]
+app.provide FileCache.new
+
+Router.new do
+    track './public'
+    track './exposed/pwa' if Vault.select('manifest.shared')[:pwa]
     @route_ext = [ :rb, :erb, :sql ]
     @no_route_ext = [ :html, :js, :css, :md, :json, :png ]
     app.serve self
