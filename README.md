@@ -8,11 +8,12 @@
 Rubidium is an HTTP framework focused on a hierarchical and intuitive resource fetching model where each file is renderer based on its kind. This model allows a maintainable server structure and an abstracted file rendering process.
 
 Standard services and utilities, some of them are not available yet
-- [x] Server, abstract the process of comunication with clients and uses the middleware
-- [x] Renderer, in charge of selecting a rederer for the request file and process it
-- [x] File Inspector, provides files from the hard disk and allows some kind of policy to maintain them in memory
+- [x] Server, it abstracts the process of comunication with clients and uses the middleware
+- [x] Renderer, it's in charge of selecting a rederer for the request file and process it
+- [x] File Cache, it reads the files from the hard disk and keep them in memory
+- [x] Router, it maps the tracked folders and translates the http route into a file in disk
+- [x] SQL Database Connector (currently PostgreSQL Connnector), it provides multiple connections to one database and handles sql queries
 - [ ] Runtime Monitor, listen to commands at runtime for services maintenance
-- [ ] Database Connector, provides multiple connections to one database
 
 Those processes can comunicate among them using primitives exposed to the aplication with an unique name. The application module support launching processes from any of the services, besides its allows including services at the beggining of the application extending its functionalities.
 
@@ -35,7 +36,7 @@ Public files served by the application server are located at [public](./public) 
 If you notice the lack of a renderer or want a custom one, add it to the [renderers](./lib/services/renderers) folder and `use` it at the Renderer in the [main](./main.rb) application file for an extension
 
 ## Features already included
-- Routing system of mounted folders like *./public*
+- Routing system of mounted folders like *./public* and every subfolder of *./exposed*
 - `PostgreSQL` database connection and queries
 - `Template` rendering
 - Ruby HTTP `Controllers`
@@ -43,8 +44,8 @@ If you notice the lack of a renderer or want a custom one, add it to the [render
 - Error handlers and redirections
 - Early `PWA` support
 - Configuration folder system called *Vault*
+- `Cache` layers for fast response to parameterized requests
+- Custom `Web Components` fully written in `Ruby` with Opal
 
 ## Features in progress for first release
 - Built-in privacy system using session middleware and file system
-- Cache module for fast response to generic and no parametrized requests
-- Custom http components
