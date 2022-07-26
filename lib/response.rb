@@ -26,9 +26,10 @@ class Response
     def write(version, bodiless)
         raise "Expecting block to write response into" unless block_given?
         yield "#{version} #{@code} #{@concept}\r\n"
-        headers.include 'Content-Length', body.nil? ? 0 : body.length unless bodiless
+        strbody = body.to_s
+        headers.include 'Content-Length', body.nil? ? 0 : strbody.length unless bodiless
         headers.each { |k,v| yield "#{k.to_s}: #{v.to_s}\r\n" }
         yield "\r\n"
-        yield body unless body.nil? or bodiless
+        yield strbody unless body.nil? or bodiless
     end
 end
