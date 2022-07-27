@@ -32,8 +32,6 @@ class FileRecord
 end
 
 class FileCache < Service
-    policy :restart
-    policy :inspect
 
     attr_reader :target, :records, :route_ext, :no_route_ext, :tree
 
