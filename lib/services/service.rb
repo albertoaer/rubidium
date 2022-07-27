@@ -1,26 +1,19 @@
+def policy_template(to, name, default)
+    n = "@#{name.to_s}".to_sym
+    to.define_singleton_method "do_#{name.to_s}".to_sym do
+        x = instance_variable_get n
+        return default if x.nil?
+        x
+    end
+    to.define_singleton_method "set_#{name.to_s}".to_sym do |v|
+        instance_variable_set n, v
+    end
+end
+
 class Service
-    @@default_policies = { restart: false, inspect: false }
-    class << self
-        def policies
-            unless instance_variable_defined? :@policies
-                @policies = Hash.new
-            end
-            @policies
-        end
-    end
-
-    def self.policy(name, action=true)
-        self.policies[name] = action
-    end
-
-    def self.about(service, action)
-        if service.class.respond_to? :policies and not service.class.policies.nil? and service.class.policies.key? action
-            service.class.policies[action]
-        else
-            @@default_policies[action]
-        end
-    end
-
+    policy_template(self, :inspect, false)
+    policy_template(self, :restart, false)
+    
     def initialize(&block)
         instance_exec &block if block_given?
     end

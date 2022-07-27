@@ -4,7 +4,7 @@ require_relative 'service'
 require_relative '../http_error'
 
 class Router < Service
-    policy :inspect
+    set_inspect true
 
     attr_reader :targets, :records, :route_ext, :no_route_ext, :tree
 

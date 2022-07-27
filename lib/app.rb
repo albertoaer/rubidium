@@ -46,21 +46,29 @@ class App
     private
 
     def launch(runnable)
-        if runnable.class.method_defined? :call
+        service_kind = runnable.class
+        if service_kind.method_defined? :call
             @pool.post do
                 finnished = false
                 begin
                     runnable.call
                 rescue StandardError => e
-                    puts "Rescued[#{runnable.class.name}]: #{e.inspect}"
-                    e.backtrace.each { |x| puts "\t#{x}" } if Service.about runnable, :inspect
+                    puts "Rescued[#{service_kind.name}]: #{e.inspect}"
+                    e.backtrace.each { |x| puts "\t#{x}" } if method_or_false service_kind, :do_inspect
                 else
                     finnished = true
-                end while Service.about runnable, :restart
+                end while method_or_false service_kind, :do_restart
                 if not finnished
-                    puts "Aborted[#{runnable.class.name}]"
+                    puts "Aborted[#{service_kind.name}]"
                 end
             end
         end
+    end
+
+    private
+
+    def method_or_false(target, method)
+        return target.method(method).call if target.respond_to? method
+        false
     end
 end

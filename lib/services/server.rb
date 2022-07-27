@@ -5,8 +5,8 @@ require_relative '../http_error'
 require_relative '../middleware/middleware'
 
 class Server < Service
-    policy :restart
-    policy :inspect
+    set_inspect true
+    set_restart true
 
     attr_reader :config
 

@@ -3,7 +3,7 @@ require 'concurrent'
 require_relative 'service'
 
 class SQLConnector < Service
-    policy :inspect
+    set_inspect true
 
     def initialize(&block)
         @connected = Concurrent::Semaphore.new(0)
