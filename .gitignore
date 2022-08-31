@@ -4,3 +4,4 @@ public/*
 
 #Avoid ignore welcome files ;)
 !public/welcome.*
+!public/not_found.md
