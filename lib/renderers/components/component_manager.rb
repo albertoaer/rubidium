@@ -1,15 +1,26 @@
 require 'opal'
 require 'opal/jquery'
 
+##
+# ComponentManager is the class that loads the components and assembles them into the html
+# Make sure the components are located in the referenced directories and named *_component.rb
 class ComponentManager
+    ##
+    # All the folders at paths will be included into the component search
     def initialize(*paths)
         @paths = paths
+        #include de folder with the default components
+        @paths.push(File.join File.dirname(__FILE__), 'defined')
         @components = {}
         @paths.each do |path|
-            Dir.glob(File.join(path, '*')) do |p|
-                if File.file?(p) and !!File.basename(p).match(/^[a-z]+\_component\.rb$/)
-                    @components[File.basename(p).sub(/\_component\.rb$/, '')] = p
+            begin
+                Dir.glob(File.join(path, '*')) do |p|
+                    if File.file?(p) and !!File.basename(p).match(/^[a-z]+\_component\.rb$/)
+                        @components[File.basename(p).sub(/\_component\.rb$/, '')] = p
+                    end
                 end
+            rescue StandardError => e
+                puts "Error during component folder inclusion: #{e}"
             end
         end
     end

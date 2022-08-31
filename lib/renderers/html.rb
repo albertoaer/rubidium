@@ -5,7 +5,9 @@ require_relative '../http_error'
 require_relative 'components/component_manager.rb'
 
 class HTMLRenderer < RawRenderer
-    @@component_manager = ComponentManager.new './lib/renderers/components'
+
+    # User defined components will be located at the ./components folder from being . the root
+    @@component_manager = ComponentManager.new './components'
 
     def render(req)
         obligatory_only(req)
