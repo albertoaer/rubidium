@@ -68,16 +68,27 @@ class Router < Service
             raise "Collision detected for tree name '#{name}' on: #{rpath}" if vessel.key? name
             vessel[name] = data
         end
-        unless restrictions.nil?
-            JSON.load_file(restrictions).map do |k,v|
-                raise "Trying to apply authorization to unknown element" unless dirmap.key? k
-            end
+        restrict_elements(restrictions, dirmap) unless restrictions.nil?
+    end
+
+    ## Loads from the restrictions JSON the authorization levels for each file 
+    # Only applies to the base of the path, example having a.html, b.html, a.js:
+    #{
+    #   "a": "internal",
+    #   "b": "all"
+    #   ...
+    #}
+    def restrict_elements(restrictions, dirmap)
+        JSON.load_file(restrictions).map do |k,v|
+            raise "Invalid authorization level" unless v.class == String and @services.call(:is_permission?, v.to_sym)
+            raise "Trying to apply authorization to unknown element" unless dirmap.key? k
+            dirmap[k].auth = v.to_sym
         end
     end
 
     ## Get the elements on a folder and the real path, also maps virtual routes as real files in presence of '.virtuals.json'
     # virtual-routes.json example:
-    # {
+    #{
     #    "virtual name (.ext?)": "real name (.ext?)"
     #    ...
     #}
@@ -153,7 +164,7 @@ class Router < Service
         ext.nil? ? nil : ext.to_sym
     end
     
-    private :map_tree, :map_dir, :get_elements, :v_divide, :v_name, :v_ext
+    private :map_tree, :map_dir, :restrict_elements, :get_elements, :v_divide, :v_name, :v_ext
 
     def exports
         { solve_route: :solve_route }
